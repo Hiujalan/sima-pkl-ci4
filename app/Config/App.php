@@ -16,7 +16,19 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost:8080/';
+    public function __construct()
+    {
+        parent::__construct();
+        if (php_sapi_name() !== 'cli') {
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+            $host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            $script   = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+
+            $this->baseURL = rtrim("{$protocol}://{$host}{$script}", '/') . '/';
+        } else {
+            $this->baseURL = getenv('app.baseURL') ?: 'http://localhost:8080/';
+        }
+    }
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
