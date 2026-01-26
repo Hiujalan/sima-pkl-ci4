@@ -14,7 +14,7 @@ class JWT extends BaseConfig
     {
         parent::__construct();
 
-        $this->key = env('JWT_SECRET', 'oTP3c5NfPBbcuym1M08VJrd4Bd88DDwy');
+        $this->key = env('JWT_SECRET');
         $this->alg = env('JWT_ALGO', 'HS256');
         $this->ttl = (int) env('JWT_TTL', 3600);
     }
