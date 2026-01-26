@@ -19,15 +19,28 @@ $routes->group('api', function ($routes) {
         $routes->post('auth/login', 'AuthController::login');
         $routes->post('auth/refresh-token', 'AuthController::refreshToken');
 
+        $routes->post('auth/logout', 'AuthController::logout');
         $routes->group('', ['filter' => 'jwt'], function ($routes) {
 
             $routes->get('auth/me', 'AuthController::me');
-            $routes->post('auth/logout', 'AuthController::logout');
 
-            $routes->resource('users', [
-                'controller' => 'UserController',
-                'except'     => ['new', 'edit'],
-            ]);
+            /*
+            |--------------------------------------------------------------------------
+            | ADMIN SECTIONS
+            |--------------------------------------------------------------------------
+            */
+
+            $routes->group('', ['filter' => 'role:super_admin'], function ($routes) {
+                $routes->resource('department', [
+                    'controller' => 'DepartmentController',
+                    'except'     => ['new', 'edit'],
+                ]);
+
+                $routes->resource('class', [
+                    'controller' => 'ClassController',
+                    'except'     => ['new', 'edit'],
+                ]);
+            });
         });
     });
 });

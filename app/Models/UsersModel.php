@@ -50,4 +50,12 @@ class UsersModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getUserByUsername(string $username)
+    {
+        return $this->select("{$this->table}.*, r.role_access")
+            ->where('user_name', $username)
+            ->join('role r', "r.role_id = {$this->table}.user_role", 'inner')
+            ->first();
+    }
 }

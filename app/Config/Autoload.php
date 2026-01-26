@@ -88,5 +88,5 @@ class Autoload extends AutoloadConfig
      *
      * @var list<string>
      */
-    public $helpers = ['api_response'];
+    public $helpers = ['api_response', 'request_mapper'];
 }

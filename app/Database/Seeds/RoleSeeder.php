@@ -12,7 +12,7 @@ class RoleSeeder extends Seeder
         $role = [
             [
                 'role_name' => 'Admin',
-                'role_access' => 'Admin',
+                'role_access' => 'super_admin',
                 'is_active' => 1,
                 'created_at' => date('Y-m-d H:i:s'),
             ],

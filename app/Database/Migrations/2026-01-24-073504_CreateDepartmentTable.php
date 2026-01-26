@@ -17,7 +17,7 @@ class CreateDepartmentTable extends Migration
             ],
             'department_name' => [
                 'type' => 'VARCHAR',
-                'constraint' => 55,
+                'constraint' => 100,
                 'null' => false,
             ],
             'is_active' => [

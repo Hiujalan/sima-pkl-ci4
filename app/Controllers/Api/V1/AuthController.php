@@ -22,24 +22,31 @@ class AuthController extends BaseController
 
     public function login()
     {
-        if (!$this->validate([
-            'email'    => 'required|valid_email',
-            'password' => 'required',
-        ])) {
-            return api_validation_error($this->validator->getErrors());
+        $payload = $this->request->getJSON(true);
+
+        if (!$payload) {
+            return api_error('Invalid JSON');
         }
 
-        $user = $this->users->where('user_name', $this->request->getPost('email'))
-            ->first();
+        $rules = [
+            'email'    => 'required|valid_email|trim',
+            'password' => 'required|trim',
+        ];
 
-        if (!$user || !password_verify($this->request->getPost('password'), $user['password'])) {
+        if (!$this->validateData($payload, $rules)) {
+            return api_validation_error($payload['email']);
+        }
+
+        $user = $this->users->getUserByUsername($payload['email']);
+
+        if (!$user || !password_verify($payload['password'], $user['password'])) {
             return api_unauthorized('Invalid credentials');
         }
 
         $accessToken = $this->jwt->generate([
             'sub' => $user['user_id'],
             'user_name' => $user['user_name'],
-            'role' => $user['user_role'] ?? null,
+            'user_role' => $user['role_access'] ?? null,
         ]);
 
         $refreshToken = bin2hex(random_bytes(40));
@@ -57,14 +64,20 @@ class AuthController extends BaseController
             'user' => [
                 'user_id' => $user['user_id'],
                 'user_name' => $user['user_name'],
-                'user_role ' => $user['user_role'],
+                'user_role ' => $user['role_access'],
             ],
         ], 'Login successful');
     }
 
     public function refreshToken()
     {
-        $refreshToken = $this->request->getPost('refresh_token');
+        $payload = $this->request->getJSON(true);
+
+        if (!$payload) {
+            return api_error('Invalid JSON');
+        }
+
+        $refreshToken = $payload['refresh_token'] ?? null;
 
         if (!$refreshToken) {
             return api_validation_error(['refresh_token' => 'Refresh token is required']);
@@ -81,7 +94,7 @@ class AuthController extends BaseController
             return api_unauthorized('Invalid or expired refresh token');
         }
 
-        $user = $this->users->find($row['user_id']);
+        $user = $this->users->getUserByUsername($row['user_id']);
 
         if (!$user) {
             return api_unauthorized('User not found');
@@ -101,7 +114,7 @@ class AuthController extends BaseController
         $newAccessToken = $this->jwt->generate([
             'user_id' => $user['user_id'],
             'user_name' => $user['user_name'],
-            'user_role' => $user['user_role'] ?? null,
+            'user_role' => $user['role_access'] ?? null,
         ]);
 
         return api_success([
@@ -117,7 +130,13 @@ class AuthController extends BaseController
 
     public function logout()
     {
-        $refreshToken = $this->request->getPost('refresh_token');
+        $payload = $this->request->getJSON(true);
+
+        if (!$payload) {
+            return api_error('Invalid JSON');
+        }
+
+        $refreshToken = $payload['refresh_token'] ?? null;
 
         if (!$refreshToken) {
             return api_validation_error(['refresh_token' => 'Refresh token is required']);
