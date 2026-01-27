@@ -28,6 +28,17 @@ class DepartmentController extends BaseController
         return api_success($query->findAll());
     }
 
+    public function show(string $uuid)
+    {
+        $query = $this->departmentModel->find($uuid);
+
+        if (!$query) {
+            return api_not_found('Department not found');
+        }
+
+        return api_success($query);
+    }
+
     public function create()
     {
         $payload = $this->request->getJSON(true);
