@@ -40,6 +40,16 @@ $routes->group('api', function ($routes) {
                     'controller' => 'ClassController',
                     'except'     => ['new', 'edit'],
                 ]);
+
+                $routes->resource('role', [
+                    'controller' => 'RoleController',
+                    'except'     => ['new', 'edit'],
+                ]);
+
+                $routes->resource('user', [
+                    'controller' => 'UserController',
+                    'except'     => ['new', 'edit'],
+                ]);
             });
         });
     });

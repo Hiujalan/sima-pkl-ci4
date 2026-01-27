@@ -16,6 +16,12 @@ class RoleSeeder extends Seeder
                 'is_active' => 1,
                 'created_at' => date('Y-m-d H:i:s'),
             ],
+            [
+                'role_name' => 'Operator',
+                'role_access' => 'operator',
+                'is_active' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
         ];
 
         $this->db->table('role')->insertBatch($role);

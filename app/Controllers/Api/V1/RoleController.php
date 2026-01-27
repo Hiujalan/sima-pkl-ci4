@@ -3,23 +3,23 @@
 namespace App\Controllers\Api\V1;
 
 use App\Controllers\BaseController;
-use App\Models\ClassModel;
+use App\Models\RoleModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use Ramsey\Uuid\Uuid;
 
-class ClassController extends BaseController
+class RoleController extends BaseController
 {
-    protected $classModel;
+    protected $roleModel;
     public function __construct()
     {
-        $this->classModel = new ClassModel();
+        $this->roleModel = new RoleModel();
     }
 
     public function index()
     {
         $user = $this->request->user;
 
-        $query = $this->classModel;
+        $query = $this->roleModel;
 
         if ($user->user_role !== 'super_admin') {
             $query->where('is_active', 1);
@@ -28,12 +28,12 @@ class ClassController extends BaseController
         return api_success($query->findAll());
     }
 
-    public function show(string $uuid)
+    public function show($id)
     {
-        $query = $this->classModel->find($uuid);
+        $query = $this->roleModel->find($id);
 
         if (!$query) {
-            return api_not_found('Class not found');
+            return api_not_found('Role not found');
         }
 
         return api_success($query);
@@ -48,24 +48,22 @@ class ClassController extends BaseController
         }
 
         $rules = [
-            'class_name' => 'required|trim',
-            'class_department ' => 'required|trim',
+            'role_name' => 'required|trim',
+            'role_access' => 'required|is_unique[role.role_access]|trim',
         ];
 
         if (!$this->validateData($payload, $rules)) {
             return api_validation_error($this->validator->getErrors());
         }
 
-        $payload['class_id'] = Uuid::uuid4()->toString();
-
-        if (!$this->classModel->save($payload)) {
-            return api_error('Failed to create class');
+        if (!$this->roleModel->save($payload)) {
+            return api_error('Failed to create role');
         }
 
-        return api_success(['message' => 'Class created successfully']);
+        return api_success(['message' => 'Role created successfully']);
     }
 
-    public function update(string $uuid)
+    public function update($id)
     {
         $payload = $this->request->getJSON(true);
 
@@ -75,15 +73,15 @@ class ClassController extends BaseController
 
         $rules = [
             'is_active'  => 'bool_is_active',
-            'class_name' => function ($value) {
+            'role_name' => function ($value) {
                 if (trim($value) === '') {
-                    return 'class_name is required';
+                    return 'role_name is required';
                 }
                 return true;
             },
-            'class_department' => function ($value) {
+            'role_access' => function ($value) {
                 if (trim($value) === '') {
-                    return 'class_department is required';
+                    return 'role_access is required';
                 }
                 return true;
             },
@@ -101,23 +99,29 @@ class ClassController extends BaseController
             ]);
         }
 
-        if (!$this->classModel->update($uuid, $result['data'])) {
-            return api_error('Failed to update class');
+        if (!$this->roleModel->update($id, $result['data'])) {
+            return api_error('Failed to update role');
         }
 
-        return api_success(['message' => 'Class updated successfully']);
+        return api_success(['message' => 'Role updated successfully']);
     }
 
-    public function delete(string $uuid)
+    public function delete($id)
     {
-        if ($this->classModel->find($uuid) === null) {
-            return api_not_found('Class not found');
+        $role = $this->roleModel->find($id);
+
+        if ($role === null) {
+            return api_not_found('Role not found');
         }
 
-        if (!$this->classModel->delete($uuid)) {
-            return api_error('Failed to delete class');
+        if ($role['role_access'] === 'super_admin') {
+            return api_error('Cannot delete super_admin role');
         }
 
-        return api_success(['message' => 'Class deleted successfully']);
+        if (!$this->roleModel->delete($id)) {
+            return api_error('Failed to delete role');
+        }
+
+        return api_success(['message' => 'Role deleted successfully']);
     }
 }
