@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Filters\CorsFilter;
 use App\Filters\JwtAuthFilter;
 use App\Filters\RoleFilter;
 use CodeIgniter\Config\Filters as BaseFilters;
@@ -38,6 +39,7 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         'jwt'   => JwtAuthFilter::class,
         'role'   => RoleFilter::class,
+        'corsFilter' => CorsFilter::class,
     ];
 
     /**
@@ -57,6 +59,7 @@ class Filters extends BaseFilters
         'before' => [
             'forcehttps', // Force Global Secure Requests
             'pagecache',  // Web Page Caching
+            'corsFilter', // Cross-Origin Resource Sharing
         ],
         'after' => [
             'pagecache',   // Web Page Caching
