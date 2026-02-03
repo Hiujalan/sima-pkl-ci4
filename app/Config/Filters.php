@@ -59,7 +59,6 @@ class Filters extends BaseFilters
         'before' => [
             'forcehttps', // Force Global Secure Requests
             'pagecache',  // Web Page Caching
-            'corsFilter', // Cross-Origin Resource Sharing
         ],
         'after' => [
             'pagecache',   // Web Page Caching
@@ -82,10 +81,12 @@ class Filters extends BaseFilters
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
+            'corsFilter', // Cross-Origin Resource Sharing
         ],
         'after' => [
             // 'honeypot',
             // 'secureheaders',
+            'corsFilter', // Cross-Origin Resource Sharing
         ],
     ];
 

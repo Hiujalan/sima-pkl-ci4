@@ -14,6 +14,7 @@
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
+CI_ENVIRONMENT = development
 # CI_ENVIRONMENT = production
 
 #--------------------------------------------------------------------
@@ -30,13 +31,13 @@
 # DATABASE
 #--------------------------------------------------------------------
 
-# database.default.hostname = localhost
-# database.default.database = ci4
-# database.default.username = root
-# database.default.password = root
-# database.default.DBDriver = MySQLi
+database.default.hostname = localhost
+database.default.database = sima-pkl
+database.default.username = root
+database.default.password = 
+database.default.DBDriver = MySQLi
 # database.default.DBPrefix =
-# database.default.port = 3306
+database.default.port = 3306
 
 # If you use MySQLi as tests, first update the values of Config\Database::$tests.
 # database.tests.hostname = localhost
@@ -53,7 +54,15 @@
 # ENCRYPTION
 #--------------------------------------------------------------------
 
-# encryption.key =
+encryption.key = hex2bin:8be98ae2bfb3a08344b6a2a3be665387706c23aca5eb6d2f1c18d62a9f00334a
+
+#--------------------------------------------------------------------
+# JWR TOKEN
+#--------------------------------------------------------------------
+
+JWT_SECRET = hex2bin:8be98ae2bfb3a08344b6a2a3be665387706c23aca5eb6d2f1c18d62a9f00334a
+JWT_ALGO = HS256
+JWT_TTL = 3600
 
 #--------------------------------------------------------------------
 # SESSION
