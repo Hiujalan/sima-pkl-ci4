@@ -2,24 +2,23 @@
 
 namespace App\Filters;
 
-use App\Models\DomainModel;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Filters\FilterInterface;
 
 class CorsFilter implements FilterInterface
 {
-
     public function before(RequestInterface $request, $arguments = null)
     {
         if ($request->getMethod() === 'options') {
-            $response = service('response');
-            return $this->setCorsHeaders($response);
+            return $this->setCorsHeaders(service('response'))
+                ->setStatusCode(200);
         }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
+        $response->setHeader('X-CORS-FILTER', 'ACTIVE');
         return $this->setCorsHeaders($response);
     }
 
@@ -27,27 +26,18 @@ class CorsFilter implements FilterInterface
     {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-        if ($origin) {
-            $allowedOrigins = [
-                'localhost:3000',
-            ];
-
-            $origin = rtrim($origin, '/');
-
-            if (in_array($origin, $allowedOrigins, true)) {
-                $response->setHeader('Access-Control-Allow-Origin', $origin);
-                $response->setHeader('Vary', 'Origin');
-            }
+        if ($origin === 'http://localhost:3000') {
+            $response
+                ->setHeader('Access-Control-Allow-Origin', $origin)
+                ->setHeader('Vary', 'Origin')
+                ->setHeader('Access-Control-Allow-Credentials', 'true');
         }
 
-        $response
+        return $response
             ->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
             ->setHeader(
                 'Access-Control-Allow-Headers',
                 'Content-Type, Authorization, X-Requested-With'
-            )
-            ->setHeader('Access-Control-Allow-Credentials', 'true');
-
-        return $response;
+            );
     }
 }
